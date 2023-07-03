@@ -1,0 +1,54 @@
+{
+  "name": "redstreak-redis",
+  "version": "0.0.0",
+  "description": "Redis Pub/Sub for redstreak lib.",
+  "main": "lib/index.js",
+  "types": "lib/types",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TubbyStubby/redstreak-redis.git"
+  },
+  "keywords": [
+    "redstreak",
+    "redis",
+    "pusub"
+  ],
+  "author": "TubbyStubby",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TubbyStubby/redstreak-redis/issues"
+  },
+  "homepage": "https://github.com/TubbyStubby/redstreak-redis#readme",
+  "devDependencies": {
+    "@types/jest": "^29.5.2",
+    "@types/node": "^20.3.3",
+    "@typescript-eslint/eslint-plugin": "^5.60.1",
+    "@typescript-eslint/parser": "^5.60.1",
+    "eslint": "^8.44.0",
+    "jest": "^29.5.0",
+    "redstreak": "file:../../localnpmpacks/redstreak-0.0.0.tgz",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.1.6"
+  },
+  "peerDependencies": {
+    "redstreak": "file:../../localnpmpacks/redstreak-0.0.0.tgz"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "lib"
+  ],
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  },
+  "dependencies": {
+    "redis": "^4.6.7"
+  }
+}
