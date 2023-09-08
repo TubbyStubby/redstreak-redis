@@ -8,7 +8,7 @@ type RedStreakRedisConnectionOption = {
 }
 
 type RedStreakRedisClientOption = {
-    options?: never,
+    clientOptions?: never,
     subscriber: RedisClientType,
     publisher: RedisClientType
 }
@@ -28,8 +28,6 @@ export class RedStreakRedis implements PubSub {
             this.#subscriber = createClient(options.clientOptions);
             this.#publisher = createClient(options.clientOptions);
         }
-        if(!this.#publisher.isReady) this.#publisher.connect();
-        if(!this.#subscriber.isReady) this.#subscriber.connect();
         this.#subscribed = new Set();
     }
 
