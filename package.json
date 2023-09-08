@@ -1,6 +1,6 @@
 {
   "name": "redstreak-redis",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Redis Pub/Sub for redstreak lib.",
   "main": "lib/index.js",
   "types": "lib/types",
