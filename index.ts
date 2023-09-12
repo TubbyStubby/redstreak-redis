@@ -1,22 +1,22 @@
-import { RedisClientOptions, RedisClientType, createClient } from "redis";
+import { Redis, RedisOptions } from "ioredis";
 import { PubSub, PubSubCb } from "redstreak";
 
 type RedStreakRedisConnectionOption = {
-    clientOptions: RedisClientOptions,
+    redisOptions: RedisOptions,
     subscriber?: never,
     publisher?: never
 }
 
 type RedStreakRedisClientOption = {
-    clientOptions?: never,
-    subscriber: RedisClientType,
-    publisher: RedisClientType
+    redisOptions?: never,
+    subscriber: Redis,
+    publisher: Redis
 }
 
 export class RedStreakRedis implements PubSub {
     #clientType: "self" | "provided";
     #publisher; #subscriber;
-    #subscribed: Set<string>;
+    #subscribed: Map<string, PubSubCb>;
 
     constructor(options: RedStreakRedisConnectionOption | RedStreakRedisClientOption) {
         if(options.subscriber && options.publisher) {
@@ -25,20 +25,21 @@ export class RedStreakRedis implements PubSub {
             this.#publisher = options.publisher;
         } else {
             this.#clientType = "self";
-            this.#subscriber = createClient(options.clientOptions);
-            this.#publisher = createClient(options.clientOptions);
+            this.#subscriber = new Redis(options.redisOptions);
+            this.#publisher = new Redis(options.redisOptions);
         }
-        this.#subscribed = new Set();
+        this.#subscribed = new Map();
+        this.#subscriber.on("message", (channel, message) => this.#subscribed.get(channel)?.(message));
     }
 
     async subscribe(channel: string, cb: PubSubCb): Promise<void> {
         if(this.#subscribed.has(channel)) throw new Error(`Already subscribed to ${channel}`);
-        this.#subscriber.subscribe(channel, cb);
-        this.#subscribed.add(channel);
+        this.#subscribed.set(channel, cb);
+        await this.#subscriber.subscribe(channel);
     }
 
     async publish(channel: string, message: string): Promise<void> {
-        this.#publisher.publish(channel, message);
+        await this.#publisher.publish(channel, message); 
     }
 
     async unsubscribe(channel?: string) {
@@ -48,8 +49,7 @@ export class RedStreakRedis implements PubSub {
             await this.#subscriber.unsubscribe(channel);
             this.#subscribed.delete(channel);
         } else {
-            const channels = [...this.#subscribed];
-            await this.#subscriber.unsubscribe(channels);
+            await this.#subscriber.unsubscribe(...this.#subscribed.keys());
             this.#subscribed.clear();
         }
     }
